@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+    <link rel="stylesheet" type="text/css" href="redist/easyui/themes/black/easyui.css">
+    <link rel="stylesheet" type="text/css" href="redist/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="redist/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="redist/easyui/demo/demo.css">
+	<script>
+		 if (window.require) {
+			window.nodeRequire = window.require;
+			delete window.require;
+		}
+	</script>
+    <script type="text/javascript" src="redist/require.js"></script>
+    <script type="text/javascript" src="redist/jquery-1.12.4.min.js"></script> 
+	<script type="text/javascript" src="redist/jquery.color-2.1.2.min.js"></script>
+    <script type="text/javascript" src="redist/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="redist/easyui/locale/easyui-lang-ru.js"></script>
+    <script type="text/javascript" src="redist/easyui/datagrid-groupview.js"></script>
+
+</head>
+<div  class="easyui-tabs" data-options="fit:true">
+	<div title="svg"><div id="svg" class="easyui-panel" data-options="fit:true"></div></div>
+	<div title="src"><div id="src" class="easyui-panel" data-options="fit:true"></div></div>
+</div>
+<script>
+
+	require.config({
+		baseUrl : 'script',
+		paths : {
+			bluebird : '../redist/bluebird',
+			plugins : '../plugins',
+		}
+	});
+
+	require(['ajaxutil', 'err'], function(AJAX, ERR) {
+		AJAX.call({url: "Delve.svg", dataType: 'text'})
+		.then(function(res) { 
+
+			$.Color.hook( "fill");
+
+            var map = {};
+                        
+
+			var x = new DOMParser().parseFromString(res, "image/svg+xml");
+			var scripts = x.evaluate("//*[local-name() = 'script']",x);
+			var script;
+			var elems = [];
+			while(true) {
+				script = scripts.iterateNext();
+				if (!script) break;
+				elems.push(script);
+			}
+			$.each(elems, function(i, e){
+				e.parentNode.removeChild(e);
+			});
+			var txt = new XMLSerializer().serializeToString(x);
+			$('#src').panel({content: '<pre>' + $('<div>').text(txt).html() + '</pre>'});
+			$('#svg').panel({content: txt});
+						
+			$('[id^="rect"]').each(function(i, e) { // unfill
+				$(e).css("fill", "#FFFFFF");
+			});
+
+			function paint(data) {
+				var color = '#FFFFFF';
+				if (data.alert) {
+					color = '#FFC0C0';
+					data.text.text(Math.round((new Date().getTime() - data.tm)/1000).toString());
+				} else {
+					data.text.text(data.oname);
+					if (data.watch) {
+						color = '#FFFF00';
+					}
+				}
+				data.rect.stop();
+				data.rect.animate({fill: color }, 300);
+			} 
+		 	$('[id="legend"]').remove();
+			$('[id^="def"]').each(function(i1, e1) { // remove service squares
+				$(e1).children().each(function(i2, e2) {
+					var je2 = $(e2);
+					if (!je2.is('a')) {
+						je2.remove();
+						return;
+					}
+					je2.find('[id^="ice"]').each(function(i3, e3) {
+						var je3 = $(e3);
+						je3.children().each(function(i4, e4) {
+							var je4 = $(e4);
+							je4.detach();
+							je4.appendTo(je2);
+						});
+						je3.remove();
+					});
+					je2.attr("xlink:href", "#");
+					(function() {
+						var name;
+						var data;
+						je2.children('text').each(function(i3, e3){
+							var je3 = $(e3);
+							if (typeof(name) == 'undefined') {
+								name = je3.text();						
+							} else {
+								data = {
+									text: je3,
+									rect: $(je2.find('rect')[0]),
+									watch: false,
+									tm: 0,
+									alert: false,
+									oname: (typeof(e3.id)=='undefined' || e3.id=='') ? je3.text() : ""
+								};
+								map[name] = data; 
+								je2.click(function() {
+									data.watch = ! data.watch;
+									paint(data);
+								});
+								je3.text(data.oname);
+							}
+						});
+					})();
+				});
+			});
+						
+					
+		}).catch(ERR.cFunc);
+	});
+
+	
+
+</script>
+</body>
+</html>

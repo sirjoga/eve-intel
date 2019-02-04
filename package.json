@@ -1,0 +1,49 @@
+{
+  "name": "ei",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "your app description",
+  "author": "xyz <xyz@gmail.com>",
+  "homepage": "https://linode.fatrat.ru",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "start": "electron .",
+    "pack": "build --dir",
+    "dist": "build"
+  },
+  "build": {
+    "appId": "ei",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "squirrel",
+      "icon": "build/icon.ico"
+    }
+  },
+  "devDependencies": {
+    "electron": "^4.0.4",
+    "electron-builder": "^20.38.5"
+  },
+  "dependencies": {
+    "electron-debug": "^2.1.0"
+  }
+}
