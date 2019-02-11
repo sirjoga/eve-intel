@@ -42,5 +42,8 @@
   "devDependencies": {
     "electron": "^4.0.4",
     "electron-builder": "^20.38.5"
+  },
+  "dependencies": {
+    "chokidar": "^2.1.0"
   }
 }
