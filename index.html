@@ -8,12 +8,12 @@
     <link rel="stylesheet" type="text/css" href="redist/easyui/themes/icon.css">
     <link rel="stylesheet" type="text/css" href="redist/easyui/themes/color.css">
     <link rel="stylesheet" type="text/css" href="redist/easyui/demo/demo.css">
-	<script>
+	<!--script>
 		 if (window.require) {
 			window.nodeRequire = window.require;
 			delete window.require;
 		}
-	</script>
+	</script-->
     <script type="text/javascript" src="redist/require.js"></script>
     <script type="text/javascript" src="redist/jquery-1.12.4.min.js"></script> 
 	<script type="text/javascript" src="redist/jquery.color-2.1.2.min.js"></script>
@@ -28,7 +28,7 @@
 </div>
 <script>
 
-	require.config({
+	requirejs.config({
 		baseUrl : 'script',
 		paths : {
 			bluebird : '../redist/bluebird',
@@ -36,7 +36,7 @@
 		}
 	});
 
-	require(['ajaxutil', 'err'], function(AJAX, ERR) {
+	requirejs(['ajaxutil', 'err'], function(AJAX, ERR) {
 		AJAX.call({url: "Delve.svg", dataType: 'text'})
 		.then(function(res) { 
 
@@ -124,10 +124,20 @@
 					})();
 				});
 			});
+
+
+			var fs = require('fs');
+			var tail = require('tail');
+
+			fs.watch('/home/sergey/Documents/EVE/logs/Chatlogs', (eventType, filename) => {
+				console.log(eventType);
+				// could be either 'rename' or 'change'. new file event and delete
+				// also generally emit 'rename'
+				console.log(filename);
+			})
+
 						
-			var fs = nodeRequire('fs');
-			var sys = nodeRequire('sys');
-					
+
 		}).catch(ERR.cFunc);
 
 
