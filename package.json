@@ -44,6 +44,7 @@
     "electron-builder": "^20.38.5"
   },
   "dependencies": {
+    "read-last-lines": "^1.6.0",
     "tail": "^2.0.2"
   }
 }

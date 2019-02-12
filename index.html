@@ -129,12 +129,14 @@
 			var fs = require('fs');
 			var tail = require('tail');
 
+			var files = {};
+
 			fs.watch('/home/sergey/Documents/EVE/logs/Chatlogs', (eventType, filename) => {
-				console.log(eventType);
-				// could be either 'rename' or 'change'. new file event and delete
-				// also generally emit 'rename'
+				if (eventType != 'change') return;
+				if (typeof(files[filename] == 'undefined') {
+				}
 				console.log(filename);
-			})
+			});
 
 						
 
