@@ -42,7 +42,7 @@
 
 			$.Color.hook( "fill");
 
-            var map = {};
+			var map = {};
                         
 
 			var x = new DOMParser().parseFromString(res, "image/svg+xml");
@@ -116,6 +116,7 @@
 								map[name] = data; 
 								je2.click(function() {
 									data.watch = ! data.watch;
+									new Audio('click.wav').play();
 									paint(data);
 								});
 								je3.text(data.oname);
@@ -127,16 +128,67 @@
 
 
 			var fs = require('fs');
-			var tail = require('tail');
 
 			var files = {};
 
-			fs.watch('/home/sergey/Documents/EVE/logs/Chatlogs', (eventType, filename) => {
+			var old = {};
+
+			var pref = '/home/sergey/Documents/EVE/logs/Chatlogs';
+			fs.watch(pref, (eventType, filename) => {
 				if (eventType != 'change') return;
-				if (typeof(files[filename] == 'undefined') {
+				if (typeof(files[filename]) == 'undefined') {
+					files[filename] = fs.openSync(pref + '/' + filename, 'r');
 				}
-				console.log(filename);
+				var rb = 0;
+				var buf = Buffer.alloc(4096);
+				var count = fs.readSync(files[filename], buf, 0, 4096, null);
+				var arr = buf.toString('UTF-16le', 0, count).split(/\r?\n/); 
+				var aStart = 0; var aEnd = arr.length;
+				if (aEnd-aStart > 2) aStart = aEnd - 2;
+				var i, s, s1
+				for (i = aStart; i<aEnd; i++) {
+					s = arr[i];
+					if (s.indexOf('[')!=1) continue;
+					s = s.replace(/^\s*\[[^\]]+\]\s*/, '');
+					if (typeof(old[s])!='undefined') continue;
+					old[s] = + new Date();
+
+					for (i in map) if (map.hasOwnProperty(i)) {
+							s1 = s;
+							s1 = s1.replace(/^[^\>]+\>\s*/, '');
+							s1 = s1.replace(i, '');
+							s1 = s1.replace(/\*/,'','g');
+							s1 = s1.replace(/\?/,'','g');
+							s1 = s1.trim().toLowerCase();
+							if (s1 == 'clr' || s1 =='status' || s1 == '') continue;
+							if (s.indexOf(i) >=0) {
+								map[i].tm = new Date().getTime();
+								map[i].alert = true;
+								(function() {
+									var a = new Audio(map[i].watch ? 'alarm.wav' : 'click.wav');
+									a.play();
+								})();
+								paint(map[i]);
+							}
+						}
+
+				}
+				for (i in old) if (old.hasOwnProperty(i)) {
+					if (+ new Date() - old[i] > 5000) delete old[i];
+				}
+
+
 			});
+
+			function tick() {
+				var i;
+				for (i in map) if (map.hasOwnProperty(i) && map[i].alert) {
+					if (new Date().getTime() - map[i].tm > 20000) map[i].alert = 0;
+					paint(map[i]);
+				}
+				setTimeout(function(){tick();}, 1000);
+			}
+			tick();
 
 						
 
