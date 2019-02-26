@@ -60,21 +60,26 @@
 			});
 			var txt = new XMLSerializer().serializeToString(x);
 			$('#src').panel({content: '<pre>' + $('<div>').text(txt).html() + '</pre>'});
-			$('#svg').panel({content: txt});
+			var svg = $('#svg');
+
+			svg.panel({content: txt});
+
+			$('#svgdoc').css("transform-origin", "top left");
 
 			function doZoom() {
 					$('#svgdoc').css("transform", "scale(" + zoom + ")");
+					svg.panel('layout');
 			}
 
 
 
 			$('#zoom_in').click(function() {
-					zoom = zoom * 1.25;
+					zoom = zoom * 2;
 					doZoom();
 			});
 
 			$('#zoom_out').click(function() {
-					zoom = zoom / 1.25;
+					zoom = zoom / 2;
 					doZoom();
 			});
 
