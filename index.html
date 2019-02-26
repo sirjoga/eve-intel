@@ -4,7 +4,7 @@
 	<meta charset="utf-8"/>
 	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
-    <link rel="stylesheet" type="text/css" href="redist/easyui/themes/black/easyui.css">
+    <link rel="stylesheet" type="text/css" href="redist/easyui/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css" href="redist/easyui/themes/icon.css">
     <link rel="stylesheet" type="text/css" href="redist/easyui/themes/color.css">
     <link rel="stylesheet" type="text/css" href="redist/easyui/demo/demo.css">
@@ -60,6 +60,9 @@
 			var txt = new XMLSerializer().serializeToString(x);
 			$('#src').panel({content: '<pre>' + $('<div>').text(txt).html() + '</pre>'});
 			$('#svg').panel({content: txt});
+			$('#zoom_in').click(function() {
+					$('#svgdoc').css("transform", "scale(2.0)");
+			});
 						
 			$('[id^="rect"]').each(function(i, e) { // unfill
 				$(e).css("fill", "#FFFFFF");
@@ -78,7 +81,8 @@
 				}
 				data.rect.stop();
 				data.rect.animate({fill: color }, 300);
-			} 
+			}
+			$('[id="controls"]').css('display', '');
 		 	$('[id="legend"]').remove();
 			$('[id^="def"]').each(function(i1, e1) { // remove service squares
 				$(e1).children().each(function(i2, e2) {
