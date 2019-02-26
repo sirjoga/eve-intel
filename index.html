@@ -44,6 +44,7 @@
 
 			var map = {};
                         
+			var zoom = 1;
 
 			var x = new DOMParser().parseFromString(res, "image/svg+xml");
 			var scripts = x.evaluate("//*[local-name() = 'script']",x);
@@ -60,9 +61,24 @@
 			var txt = new XMLSerializer().serializeToString(x);
 			$('#src').panel({content: '<pre>' + $('<div>').text(txt).html() + '</pre>'});
 			$('#svg').panel({content: txt});
+
+			function doZoom() {
+					$('#svgdoc').css("transform", "scale(" + zoom + ")");
+			}
+
+
+
 			$('#zoom_in').click(function() {
-					$('#svgdoc').css("transform", "scale(2.0)");
+					zoom = zoom * 1.25;
+					doZoom();
 			});
+
+			$('#zoom_out').click(function() {
+					zoom = zoom / 1.25;
+					doZoom();
+			});
+
+
 						
 			$('[id^="rect"]').each(function(i, e) { // unfill
 				$(e).css("fill", "#FFFFFF");
