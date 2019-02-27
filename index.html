@@ -72,7 +72,7 @@
 		<a href="#" class="easyui-linkbutton" id="bZoomIn" data-options="width:20">+</a><br/>
 		<a href="#" class="easyui-linkbutton" id="bZoomOut" data-options="width:20">-</a>
 	</div>
-	<div id="svg" class="easyui-panel" data-options="fit:true,region:'center',border:false">
+	<div id="svg" class="easyui-panel" data-options="region:'center',border:false">
 	</div>
 </div>
 
@@ -169,7 +169,8 @@
 
 			function doZoom() {
 				$('#svgdoc').css("transform", "scale(" + zoom + ")");
-				svg.panel('layout');
+				$(window).resize();
+
 			}
 
 
