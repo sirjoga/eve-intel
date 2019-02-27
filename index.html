@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+	<style>
+		* {
+		    -webkit-touch-callout:none;
+		    -webkit-user-select:none;
+		    -moz-user-select:none;
+		    -ms-user-select:none;
+		    user-select:none;
+		}
+
+		
+		input, textarea /*.contenteditable?*/ {
+	    -webkit-touch-callout:default;
+	    -webkit-user-select:text;
+	    -moz-user-select:text;
+	    -ms-user-select:text;
+	    user-select:text;
+		}
+
+	
+	</style>
+
+
 	<meta charset="utf-8"/>
 	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
@@ -23,6 +46,7 @@
 
 </head>
 <body>
+	
 <div id="dial" class="easyui-dialog" title="Monitor settings" style="width:400px;height:1333x;"
         data-options="iconCls:'icon-save',resizable:true,modal:true,buttons:'#bb',closed:true">
 		<table style="padding:5px;">
@@ -43,7 +67,13 @@
 </div>
 -->
 
-<div id="svg" class="easyui-panel" data-options="fit:true">
+<div class="easyui-layout" data-options="fit:true">
+	<div class="easyui-panel" data-options="region:'west',border:false,width:'30px'">
+		<a href="#" class="easyui-linkbutton" id="bZoomIn" data-options="width:20">+</a><br/>
+		<a href="#" class="easyui-linkbutton" id="bZoomOut" data-options="width:20">-</a>
+	</div>
+	<div id="svg" class="easyui-panel" data-options="fit:true,region:'center',border:false">
+	</div>
 </div>
 
 <script>
@@ -144,12 +174,12 @@
 
 
 
-			$('#zoom_in').click(function() {
+			$('#bZoomIn').click(function() {
 				zoom = zoom * 2;
 				doZoom();
 			});
 
-			$('#zoom_out').click(function() {
+			$('#bZoomOut').click(function() {
 				zoom = zoom / 2;
 				doZoom();
 			});
@@ -164,6 +194,7 @@
 				var color = '#FFFFFF';
 				if (data.alert) {
 					color = '#FFC0C0';
+					if (data.watch) color = '#FF00FF';
 					data.text.text(Math.round((new Date().getTime() - data.tm)/1000).toString());
 				} else {
 					data.text.text(data.oname);
