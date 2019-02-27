@@ -311,6 +311,7 @@
 				var count = fs.readSync(files[filename], buf, 0, 4096, null);
 				var arr = buf.toString('UTF-16le', 0, count).split(/\r?\n/); 
 				var aStart = 0; var aEnd = arr.length;
+				while (aEnd > 0 && arr[aEnd-1] == '') aEnd--;
 				if (isNewFile && (aEnd>0)) aStart = aEnd-1;
 				var i, j,  s, sOrig, s1, dl;
 				for (i = aStart; i<aEnd; i++) {
