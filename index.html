@@ -22,10 +22,30 @@
     <script type="text/javascript" src="redist/easyui/datagrid-groupview.js"></script>
 
 </head>
+<body>
+<div id="dial" class="easyui-dialog" title="Monitor settings" style="width:400px;height:1333x;"
+        data-options="iconCls:'icon-save',resizable:true,modal:true,buttons:'#bb',closed:true">
+		<table style="padding:5px;">
+						<tr><td>Region</td><td><input class="easyui-textbox" id="tbRegion" data-options="prompt:'Delve'"></td></tr>
+						<tr><td>Ingame channel</td><td><input class="easyui-textbox" id="tbChannel" data-options="prompt:'delve.imperium'"></td></tr>
+		</table>
+</div>
+
+<div id="bb">
+		<a href="#" id="bSave" class="easyui-linkbutton">Save</a>
+		<a href="#" id="bCancel" class="easyui-linkbutton">Cancel</a>
+</div>
+
+<!--
 <div  class="easyui-tabs" data-options="fit:true">
 	<div title="svg"><div id="svg" class="easyui-panel" data-options="border:false,fit:true"></div></div>
 	<div title="src"><div id="src" class="easyui-panel" data-options="border:false,fit:true"></div></div>
 </div>
+-->
+
+<div id="svg" class="easyui-panel" data-options="fit:true">
+</div>
+
 <script>
 
 	requirejs.config({
@@ -36,9 +56,60 @@
 		}
 	});
 
-	requirejs(['ajaxutil', 'err'], function(AJAX, ERR) {
-		AJAX.call({url: "Delve.svg", dataType: 'text'})
-		.then(function(res) { 
+	requirejs(['ajaxutil', 'err', 'bluebird'], function(AJAX, ERR, Promise) {
+
+		var fs = require('fs');
+		var docDir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+		var myDir = docDir + "/.eveIntel";
+
+		var config = {};
+		var regPromise;
+		(function(){
+			if (!fs.existsSync(myDir)) {
+				fs.mkdirSync(myDir);
+			}
+			if (fs.existsSync(myDir + "/config")) {
+				config = JSON.parse(fs.readFileSync(myDir + "/config", "utf8"));
+			}
+			var d = $('#dial');
+			if (typeof(config.region)!='undefined') $('#tbRegion').textbox('setValue', config.region);
+			if (typeof(config.channel)!='undefined') $('#tbChannel').textbox('setValue', config.channel);
+			d.dialog('open');
+			regPromise = new Promise(function(resolve, reject) {
+				$('#bSave').linkbutton({
+					'onClick': function() {
+						d.dialog('close');
+						resolve({region: $('#tbRegion').textbox('getValue'), channel: $('#tbChannel').textbox('getValue')});
+				}});
+				$('#bCancel').linkbutton({
+					'onClick': function() {
+						d.dialog('close');
+						reject("Operation cancelled");
+				}});
+			}).then(function(res) {
+				var regFName = res.region.replace(' ', '_');
+				config.region = res.region;
+				config.channel = res.channel;
+				fs.writeFileSync(myDir + '/config', JSON.stringify(config), 'utf8');
+				var svgFName = myDir + "/" + regFName + '.svg';
+				if(fs.existsSync(svgFName)) {
+					return {region: res.region, channel: res.channel, svg: fs.readFileSync(svgFName)}
+				} else {
+					return AJAX.call({url: "http://evemaps.dotlan.net/svg/" + regFName + '.svg', dataType: 'text'}).then(function(svg) {
+						fs.writeFileSync(svgFName, svg, 'utf8');
+						return {region: res.region, channel: res.channel, svg: svg};
+					});
+				}
+			})
+		})();
+			
+		
+
+
+
+
+
+		regPromise.then(function(res) { 
 
 			$.Color.hook( "fill");
 
@@ -46,7 +117,7 @@
                         
 			var zoom = 1;
 
-			var x = new DOMParser().parseFromString(res, "image/svg+xml");
+			var x = new DOMParser().parseFromString(res.svg, "image/svg+xml");
 			var scripts = x.evaluate("//*[local-name() = 'script']",x);
 			var script;
 			var elems = [];
@@ -59,7 +130,7 @@
 				e.parentNode.removeChild(e);
 			});
 			var txt = new XMLSerializer().serializeToString(x);
-			$('#src').panel({content: '<pre>' + $('<div>').text(txt).html() + '</pre>'});
+//			$('#src').panel({content: '<pre>' + $('<div>').text(txt).html() + '</pre>'});
 			var svg = $('#svg');
 
 			svg.panel({content: txt});
@@ -67,20 +138,20 @@
 			$('#svgdoc').css("transform-origin", "top left");
 
 			function doZoom() {
-					$('#svgdoc').css("transform", "scale(" + zoom + ")");
-					svg.panel('layout');
+				$('#svgdoc').css("transform", "scale(" + zoom + ")");
+				svg.panel('layout');
 			}
 
 
 
 			$('#zoom_in').click(function() {
-					zoom = zoom * 2;
-					doZoom();
+				zoom = zoom * 2;
+				doZoom();
 			});
 
 			$('#zoom_out').click(function() {
-					zoom = zoom / 2;
-					doZoom();
+				zoom = zoom / 2;
+				doZoom();
 			});
 
 
@@ -103,7 +174,7 @@
 				data.rect.stop();
 				data.rect.animate({fill: color }, 300);
 			}
-			$('[id="controls"]').css('display', '');
+//			$('[id="controls"]').css('display', '');
 		 	$('[id="legend"]').remove();
 			$('[id^="def"]').each(function(i1, e1) { // remove service squares
 				$(e1).children().each(function(i2, e2) {
@@ -152,15 +223,21 @@
 			});
 
 
-			var fs = require('fs');
 
 			var files = {};
 
 			var old = {};
 
-			var pref = '/home/sergey/Documents/EVE/logs/Chatlogs';
+
+
+			var pref = docDir + '/Documents/EVE/logs/Chatlogs';
+
+			
+
+
 			fs.watch(pref, (eventType, filename) => {
 				if (eventType != 'change') return;
+				if (filename.indexOf(res.channel+'_')!=0) return;
 				if (typeof(files[filename]) == 'undefined') {
 					files[filename] = fs.openSync(pref + '/' + filename, 'r');
 				}
@@ -179,23 +256,23 @@
 					old[s] = + new Date();
 
 					for (i in map) if (map.hasOwnProperty(i)) {
-							s1 = s;
-							s1 = s1.replace(/^[^\>]+\>\s*/, '');
-							s1 = s1.replace(i, '');
-							s1 = s1.replace(/\*/,'','g');
-							s1 = s1.replace(/\?/,'','g');
-							s1 = s1.trim().toLowerCase();
-							if (s1 == 'clr' || s1 =='status' || s1 == '') continue;
-							if (s.indexOf(i) >=0) {
-								map[i].tm = new Date().getTime();
-								map[i].alert = true;
-								(function() {
-									var a = new Audio(map[i].watch ? 'alarm.wav' : 'click.wav');
-									a.play();
-								})();
-								paint(map[i]);
-							}
+						s1 = s;
+						s1 = s1.replace(/^[^\>]+\>\s*/, '');
+						s1 = s1.replace(i, '');
+						s1 = s1.replace(/\*/,'','g');
+						s1 = s1.replace(/\?/,'','g');
+						s1 = s1.trim().toLowerCase();
+						if (s1 == 'clr' || s1 =='status' || s1 == '') continue;
+						if (s.indexOf(i) >=0) {
+							map[i].tm = new Date().getTime();
+							map[i].alert = true;
+							(function() {
+								var a = new Audio(map[i].watch ? 'alarm.wav' : 'click.wav');
+								a.play();
+							})();
+							paint(map[i]);
 						}
+					}
 
 				}
 				for (i in old) if (old.hasOwnProperty(i)) {
