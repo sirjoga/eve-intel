@@ -3,9 +3,11 @@
 <head>
 
 
-	<link id="cssWhite" rel="stylesheet" type="text/css" href="white.css"/>
-	<link id="cssBlack" rel="stylesheet" type="text/css" href="black.css" disabled="true"/>
+	<link data-style="white" rel="stylesheet" type="text/css" href="white.css"/>
+	<link data-style="black" rel="stylesheet" type="text/css" href="black.css"/>
 
+    <link data-style="white" rel="stylesheet" type="text/css" href="redist/easyui/themes/default/easyui.css">
+    <link data-style="black" rel="stylesheet" type="text/css" href="redist/easyui/themes/black/easyui.css">
 
 
 	<style>
@@ -33,7 +35,6 @@
 	<meta charset="utf-8"/>
 	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
-    <link rel="stylesheet" type="text/css" href="redist/easyui/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css" href="redist/easyui/themes/icon.css">
     <link rel="stylesheet" type="text/css" href="redist/easyui/themes/color.css">
     <link rel="stylesheet" type="text/css" href="redist/easyui/demo/demo.css">
@@ -83,13 +84,27 @@
 		<a href="#" class="easyui-linkbutton easyui-tooltip" title="Zoom in (ctrl+wheel_up)" id="bZoomIn" data-options="position:'right',width:25">+</a><br/>
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Zoom out (ctrl+wheel_down)" id="bZoomOut" data-options="position:'right',width:25">-</a><br/>
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Toggle log window" id="bProto" data-options="position:'right',width:25">...</a>
-		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Night mode" id="bNight" data-options="position:'right',width:25,toggle:true">@</a>
+		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Night mode" id="bNight" data-options="position:'right',width:25,toggle:true">🌗</a>
 	</div>
 	<div id="svg" class="easyui-panel" data-options="region:'center',border:false">
 	</div>
 </div>
 
 <script>
+$(function() {
+	function themeName() {
+		return  $('#bNight').linkbutton('options').selected ? "black" : "white";
+	}
+
+	function setTheme() {
+		var name = themeName();
+		$.each($('[data-style]'), function(i, e) {
+			var je = $(e);
+			if (je.data("style") == name) e.disabled = false; else e.disabled = true;
+		});
+	}
+
+	setTheme();
 
 	requirejs.config({
 		baseUrl : 'script',
@@ -175,12 +190,9 @@
 			}});
 
 			(function() {
-				var sWhite = $('#cssWhite');
-				var sBlack = $('#cssBlack');
 				$('#bNight').linkbutton({onClick: function(){
-					var isWhite = !$('#bNight').linkbutton('options').selected;
-					sWhite[0].disabled = !isWhite;
-					sBlack[0].disabled = isWhite;
+					setTheme();		
+					repaint();
 				}});
 		
 				
@@ -193,6 +205,7 @@
 			var zoom = 1;
 
 			var x = new DOMParser().parseFromString(res.svg, "image/svg+xml");
+			x.documentElement.removeAttribute('style');
 			xmlForEach(x.evaluate("//*[local-name() = 'script']",x), function(e) {
 				e.parentNode.removeChild(e);
 			});
@@ -241,26 +254,29 @@
 			});
 
 
-						
-			$('[id^="rect"]').each(function(i, e) { // unfill
-				$(e).css("fill", "#FFFFFF");
-			});
 
+			function repaint() {
+				for (i in map) if (map.hasOwnProperty(i)) paint(map[i]);
+			}
+						
 			function paint(data) {
-				var color = '#FFFFFF';
+				var isBlack  = themeName() == 'black';
+				var color = isBlack? '#505050' : '#FFFFFF';
 				if (data.alert) {
-					color = '#FFC0C0';
-					if (data.watch) color = '#FFAAFF';
+					color = isBlack ? '#A00000': '#FFC0C0';
+					if (data.watch) color = isBlack ? '#800080' : '#FFAAFF';
 					data.text.text(Math.round((new Date().getTime() - data.tm)/1000).toString());
 				} else {
 					data.text.text(data.oname);
 					if (data.watch) {
-						color = '#FFFF00';
+						color = isBlack ? '#A0A000' : '#FFFF00';
 					}
 				}
 				data.rect.stop();
 				data.rect.animate({fill: color }, 300);
 			}
+
+
 //			$('[id="controls"]').css('display', '');
 		 	$('[id="legend"]').remove();
 			$('[id^="def"]').each(function(i1, e1) { // remove service squares
@@ -382,6 +398,9 @@
 
 			});
 
+			repaint();
+
+
 			function tick() {
 				var i;
 				for (i in map) if (map.hasOwnProperty(i) && map[i].alert) {
@@ -400,7 +419,7 @@
 	});
 
 	
-
+});
 </script>
 </body>
 </html>

@@ -1,48 +1,36 @@
-
+g { background: #000000; }
 .j	{ stroke: #000000; stroke-width: 1; }
-.jc	{ stroke: #FF0000; stroke-width: 1; }
-.jr	{ stroke: #800080; stroke-width: 1; }
-.jx	{ stroke: #000000; stroke-width: 3; }
-.jxc	{ stroke: #FF0000; stroke-width: 3; }
-.jxr	{ stroke: #800080; stroke-width: 3; }
-.jb	{ stroke: #0000FF; stroke-width: 3; fill: none; }
+.jc	{ stroke: #FFA0A0; stroke-width: 1; }
+.jr	{ stroke: #C0C0C0; stroke-width: 1; }
+.jx	{ stroke: #FFFFFF; stroke-width: 3; }
+.jxc	{ stroke: #FFA0A0; stroke-width: 3; }
+.jxr	{ stroke: #C000C0; stroke-width: 3; }
+.jb	{ stroke: #A0A0FF; stroke-width: 3; fill: none; }
 
 /* external system */
-.eh	{ stroke: #00B000; stroke-width: 1; fill: #CCCCCC; }
-.el	{ stroke: #F00000; stroke-width: 1; stroke-dasharray: 8, 4; fill: #CCCCCC; }
-.e	{ stroke: #000000; stroke-width: 1; fill: #CCCCCC; }
-.exh	{ stroke: #00B000; stroke-width: 2; fill: #CCCCCC; }
-.exl	{ stroke: #F00000; stroke-width: 2; stroke-dasharray: 8, 3; fill: #CCCCCC; }
-.ex	{ stroke: #000000; stroke-width: 2; fill: #CCCCCC; }
+.eh	{ stroke: #A0F0A0; stroke-width: 1; fill: #111111; }
+.el	{ stroke: #F0A0A0; stroke-width: 1; stroke-dasharray: 8, 4; fill: #111111; }
+.e	{ stroke: #FFFFFF; stroke-width: 1; fill: #111111; }
+.exh	{ stroke: #A0F0A0; stroke-width: 2; fill: #111111; }
+.exl	{ stroke: #F0A0A0; stroke-width: 2; stroke-dasharray: 8, 3; fill: #111111; }
+.ex	{ stroke: #000000; stroke-width: 2; fill: #111111; }
 
 /* external system text */
-.es	{ font-size: 9px; font-family: Arial, Helvetica, sans-serif; fill: #000000; }
-.er	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #000000; }
+.es	{ font-size: 9px; font-family: Arial, Helvetica, sans-serif; fill: #FFFFFF; }
+.er	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #FFFFFF; }
 
 /* system */
-.sh	{ stroke: #00B000; stroke-width: 1; }
-.sl	{ stroke: #F00000; stroke-width: 1; stroke-dasharray: 8, 3; }
-.s	{ stroke: #000000; stroke-width: 1; }
+.sh	{ stroke: #A0F0A0; stroke-width: 1; }
+.sl	{ stroke: #FFA0A0; stroke-width: 1; stroke-dasharray: 8, 3; }
+.s	{ stroke: #FFFFFF; stroke-width: 1; }
 .sc	{ stroke-width: 1.2; stroke-dasharray: 4, 3; }
 .sx	{ stroke-width: 2.5; }
 
 .scl	{ stroke: transparent; stroke-width: 2; fill: transparent; }
 
 /* system text */
-.ss	{ font-family: Arial, Helvetica, sans-serif; font-size: 9px; fill: #000000; }
-.st	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #000000; }
-.so	{ fill: #ff0000; }
-.i	{ stroke: #0080FF; stroke-width: 1; fill: none; }
+.ss	{ font-family: Arial, Helvetica, sans-serif; font-size: 9px; fill: #FFFFFF; }
+.st	{ font-weight: bold; font-size: 7px; font-family: verdana, Arial, sans-serif; fill: #FFFFFF; }
+.so	{ fill: #ffA0A0; }
+.i	{ stroke: #A0E0FF; stroke-width: 1; fill: none; }
 
-/* station */
-.o	{ fill: #ffffff; }
-.oc	{ fill: #0000FF; }
-.oa	{ fill: #FFDC00; }
-.og	{ fill: #00FF00; }
-.om	{ fill: #FF0000; }
-.o1	{ fill: #ffffff; stroke-width: 0.5; stroke: #000000; }
-.o2	{ fill: #ffffff; stroke-width: 0.5; stroke: #000000; }
-.oo	{ fill: none; stroke: #000000; stroke-width: 1; }
-
-/* station services */
-.v1	{ fill: #FF0000; }
