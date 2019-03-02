@@ -2,6 +2,12 @@
 <html>
 <head>
 
+
+	<link id="cssWhite" rel="stylesheet" type="text/css" href="white.css"/>
+	<link id="cssBlack" rel="stylesheet" type="text/css" href="black.css" disabled="true"/>
+
+
+
 	<style>
 		* {
 		    -webkit-touch-callout:none;
@@ -77,6 +83,7 @@
 		<a href="#" class="easyui-linkbutton easyui-tooltip" title="Zoom in (ctrl+wheel_up)" id="bZoomIn" data-options="position:'right',width:25">+</a><br/>
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Zoom out (ctrl+wheel_down)" id="bZoomOut" data-options="position:'right',width:25">-</a><br/>
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Toggle log window" id="bProto" data-options="position:'right',width:25">...</a>
+		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Night mode" id="bNight" data-options="position:'right',width:25,toggle:true">@</a>
 	</div>
 	<div id="svg" class="easyui-panel" data-options="region:'center',border:false">
 	</div>
@@ -145,6 +152,18 @@
 
 
 
+		function xmlForEach(eval, cb) {
+			var elems = [];
+			var elem;
+			while (true) {
+				elem = eval.iterateNext();
+				if (!elem) break;
+				elems.push(elem);
+			}
+			$.each(elems, function(i, e) { cb(e);} );
+		}
+		
+
 
 		regPromise.then(function(res) { 
 
@@ -155,21 +174,29 @@
 				$('#proto').window(protoClosed?'close':'open');
 			}});
 
+			(function() {
+				var sWhite = $('#cssWhite');
+				var sBlack = $('#cssBlack');
+				$('#bNight').linkbutton({onClick: function(){
+					var isWhite = !$('#bNight').linkbutton('options').selected;
+					sWhite[0].disabled = !isWhite;
+					sBlack[0].disabled = isWhite;
+				}});
+		
+				
+				
+			})()
+
 
 			var map = {};
                         
 			var zoom = 1;
 
 			var x = new DOMParser().parseFromString(res.svg, "image/svg+xml");
-			var scripts = x.evaluate("//*[local-name() = 'script']",x);
-			var script;
-			var elems = [];
-			while(true) {
-				script = scripts.iterateNext();
-				if (!script) break;
-				elems.push(script);
-			}
-			$.each(elems, function(i, e){
+			xmlForEach(x.evaluate("//*[local-name() = 'script']",x), function(e) {
+				e.parentNode.removeChild(e);
+			});
+			xmlForEach(x.evaluate("//*[local-name() = 'style']",x), function(e) {
 				e.parentNode.removeChild(e);
 			});
 			var txt = new XMLSerializer().serializeToString(x);
