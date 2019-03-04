@@ -62,8 +62,8 @@
 <div id="dial" class="easyui-dialog" title="Monitor settings" style="width:400px;height:1333x;"
         data-options="iconCls:'icon-save',resizable:true,modal:true,buttons:'#bb',closed:true">
 		<table style="padding:5px;">
-						<tr><td>Region</td><td><input class="easyui-textbox" id="tbRegion" data-options="prompt:'Delve'"></td></tr>
-						<tr><td>Ingame channel</td><td><input class="easyui-textbox" id="tbChannel" data-options="prompt:'delve.imperium'"></td></tr>
+						<tr><td>Region</td><td><input class="easyui-textbox" id="tbRegion" data-options="prompt:'e.g. Delve'"></td></tr>
+						<tr><td>Ingame channel</td><td><input class="easyui-textbox" id="tbChannel" data-options="prompt:'e.g. delve.imperium'"></td></tr>
 		</table>
 </div>
 
@@ -85,8 +85,12 @@
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Zoom out (ctrl+wheel_down)" id="bZoomOut" data-options="position:'right',width:25">-</a><br/>
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Toggle log window" id="bProto" data-options="position:'right',width:25">...</a>
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Night mode" id="bNight" data-options="position:'right',width:25,toggle:true">🌗</a>
+		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Reload" id="bReload" data-options="position:'right',width:25">↻</a>
 	</div>
 	<div id="svg" class="easyui-panel" data-options="region:'center',border:false">
+	</div>
+	<div data-options="region:'south',border:false" style="padding:5px;">
+		Click systems to toggle alert
 	</div>
 </div>
 
@@ -143,7 +147,7 @@ $(function() {
 				$('#bCancel').linkbutton({
 					'onClick': function() {
 						d.dialog('close');
-						reject("Operation cancelled");
+						window.close();
 				}});
 			}).then(function(res) {
 				var regFName = res.region.replace(' ', '_');
@@ -339,7 +343,7 @@ $(function() {
 			
 
 
-			fs.watch(pref, (eventType, filename) => {
+			var watcher = fs.watch(pref, (eventType, filename) => {
 				var isNewFile = false;
 				var fSize;
 				var buf = Buffer.alloc(4096);
@@ -400,6 +404,15 @@ $(function() {
 			});
 
 			repaint();
+
+			$('#bReload').linkbutton({onClick: function() {
+				watcher.close();
+				for(var fl in files) if (files.hasOwnProperty(fl)) {
+					fs.closeSync(files[fl]);
+				}
+				files = {};
+				location.reload();
+			}});
 
 
 			function tick() {
