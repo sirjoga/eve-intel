@@ -108,7 +108,6 @@ $(function() {
 		});
 	}
 
-	setTheme();
 
 	requirejs.config({
 		baseUrl : 'script',
@@ -126,6 +125,12 @@ $(function() {
 
 		var config = {};
 		var regPromise;
+
+
+		function saveConfig() {
+			fs.writeFileSync(myDir + '/config', JSON.stringify(config), 'utf8');
+		}
+
 		(function(){
 			if (!fs.existsSync(myDir)) {
 				fs.mkdirSync(myDir);
@@ -136,6 +141,19 @@ $(function() {
 			var d = $('#dial');
 			if (typeof(config.region)!='undefined') $('#tbRegion').textbox('setValue', config.region);
 			if (typeof(config.channel)!='undefined') $('#tbChannel').textbox('setValue', config.channel);
+
+
+			(function(){
+				if (typeof(config.theme)!='undefined') {
+					var bNight = $('#bNight');
+					if (config.theme == 'black') bNight.linkbutton('select');
+				}										
+			})();
+
+
+
+			setTheme();
+
 			d.dialog('open');
 			$('#tbRegion').textbox('textbox').focus();
 			regPromise = new Promise(function(resolve, reject) {
@@ -153,7 +171,7 @@ $(function() {
 				var regFName = res.region.replace(' ', '_');
 				config.region = res.region;
 				config.channel = res.channel;
-				fs.writeFileSync(myDir + '/config', JSON.stringify(config), 'utf8');
+				saveConfig();
 				var svgFName = myDir + "/" + regFName + '.svg';
 				if(fs.existsSync(svgFName)) {
 					return {region: res.region, channel: res.channel, svg: fs.readFileSync(svgFName)}
@@ -198,6 +216,8 @@ $(function() {
 				$('#bNight').linkbutton({onClick: function(){
 					setTheme();		
 					repaint();
+					config.theme = themeName();
+					saveConfig();
 				}});
 		
 				
