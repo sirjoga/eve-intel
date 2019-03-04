@@ -6,7 +6,8 @@ function createWindow () {
   win = new BrowserWindow({ 
 		webPreferences: {
 			nodeIntegration: true
-		}
+		},
+		title: "EVE Intel Monitor"
   });
 
   // и загрузит index.html приложение.
