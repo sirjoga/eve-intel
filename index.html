@@ -155,6 +155,7 @@ $(function() {
 					return {region: res.region, channel: res.channel, svg: fs.readFileSync(svgFName)}
 				} else {
 					return AJAX.call({url: "http://evemaps.dotlan.net/svg/" + regFName + '.svg', dataType: 'text'}).then(function(svg) {
+						if (svg.indexOf('<?xml') != 0) throw new Error('Cannot load region from Dotlan: "' + res.region + '"');
 						fs.writeFileSync(svgFName, svg, 'utf8');
 						return {region: res.region, channel: res.channel, svg: svg};
 					});
@@ -413,7 +414,11 @@ $(function() {
 
 						
 
-		}).catch(ERR.cFunc);
+		}).catch(function(e){
+			ERR.handle(e).then(function() {
+				location.reload();
+			});
+		});
 
 
 	});
