@@ -383,10 +383,10 @@ $(function() {
 				if (isNewFile && (aEnd>0)) aStart = aEnd-1;
 				var i, j,  s, sOrig, s1, dl;
 				for (i = aStart; i<aEnd; i++) {
-					s = arr[i];
+					s = arr[i].replace(/^\s*/, '');
 					sOrig = s;
-					sOrig = sOrig.replace(/\s*\[\s*\S+\s+(\S+)\s*\]/, '[$1]');
-					if (s.indexOf('[')!=1) continue;
+					sOrig = sOrig.replace(/[\s*\S+\s+(\S+)\s*\]/, '[$1]');
+					if (s.indexOf('[')!=0) continue;
 					s = s.replace(/^\s*\[[^\]]+\]\s*/, '');
 					if (typeof(old[s])!='undefined') continue;
 					dl = $('#dlProto');
