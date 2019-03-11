@@ -385,7 +385,7 @@ $(function() {
 				for (i = aStart; i<aEnd; i++) {
 					s = arr[i].replace(/^\s*/, '');
 					sOrig = s;
-					sOrig = sOrig.replace(/[\s*\S+\s+(\S+)\s*\]/, '[$1]');
+					sOrig = sOrig.replace(/\[\s*\S+\s+(\S+)\s*\]/, '[$1]');
 					if (s.indexOf('[')!=0) continue;
 					s = s.replace(/^\s*\[[^\]]+\]\s*/, '');
 					if (typeof(old[s])!='undefined') continue;
