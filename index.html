@@ -120,7 +120,7 @@ $(function() {
 	requirejs(['ajaxutil', 'err', 'bluebird'], function(AJAX, ERR, Promise) {
 
 		var fs = require('fs');
-		var docDir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+		var docDir = (process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME']).replace(/\\/g, '/');
 		var myDir = docDir + "/.eveIntel";
 
 		var config = {};
@@ -374,7 +374,7 @@ $(function() {
 			var chokidar = require('chokidar');
 			var PATH = require('path');
 			
-			var watcher = chokidar.watch(pref + '/*.txt');
+			var watcher = chokidar.watch(pref+'/*.*', {usePolling: true, interval: 100});
 			watcher.on('change', function(path) {
 				var filename = PATH.basename(path);
 				var isNewFile = false;
