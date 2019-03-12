@@ -126,6 +126,15 @@ $(function() {
 		var config = {};
 		var regPromise;
 
+		{
+			var olddef = define;
+			define = undefined;
+			var ae = require('async-each');
+			define = olddef;	
+				
+		}
+
+
 
 		function saveConfig() {
 			fs.writeFileSync(myDir + '/config', JSON.stringify(config), 'utf8');
@@ -362,12 +371,15 @@ $(function() {
 
 			
 
-
-			var watcher = fs.watch(pref, (eventType, filename) => {
+			var chokidar = require('chokidar');
+			var PATH = require('path');
+			
+			var watcher = chokidar.watch(pref + '/*.txt');
+			watcher.on('change', function(path) {
+				var filename = PATH.basename(path);
 				var isNewFile = false;
 				var fSize;
 				var buf = Buffer.alloc(4096);
-				if (eventType != 'change') return;
 				if (filename.indexOf(res.channel+'_')!=0) return;
 				if (typeof(files[filename]) == 'undefined') {
 					files[filename] = fs.openSync(pref + '/' + filename, 'r');
