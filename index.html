@@ -374,7 +374,7 @@ $(function() {
 			var chokidar = require('chokidar');
 			var PATH = require('path');
 			
-			var watcher = chokidar.watch(pref+'/*.*', {usePolling: true, interval: 100});
+			var watcher = chokidar.watch(pref+'/*.*', {usePolling: true, interval: 500});
 			watcher.on('change', function(path) {
 				var filename = PATH.basename(path);
 				var isNewFile = false;
