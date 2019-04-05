@@ -80,12 +80,13 @@
 -->
 
 <div class="easyui-layout" data-options="fit:true">
-	<div class="easyui-panel" data-options="region:'west',border:false,width:'35px'" style="padding:5px;">
+	<div class="easyui-panel" data-options="region:'west',border:false,width:'40px'" style="padding:5px;">
 		<a href="#" class="easyui-linkbutton easyui-tooltip" title="Zoom in (ctrl+wheel_up)" id="bZoomIn" data-options="position:'right',width:25">+</a><br/>
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Zoom out (ctrl+wheel_down)" id="bZoomOut" data-options="position:'right',width:25">-</a><br/>
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Toggle log window" id="bProto" data-options="position:'right',width:25">...</a>
 		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Night mode" id="bNight" data-options="position:'right',width:25,toggle:true">🌗</a>
-		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;" title="Reload" id="bReload" data-options="position:'right',width:25">↻</a>
+		<a href="#" class="easyui-linkbutton easyui-tooltip" style="margin-top:2px;margin-bottom:5px;" title="Reload" id="bReload" data-options="position:'right',width:25">↻</a>
+		<input class="easyui-slider easyui-tooltip" id="vol" style="height:250px" data-options="mode:'v',value:100" title="Volume control"/>
 	</div>
 	<div id="svg" class="easyui-panel" data-options="region:'center',border:false">
 	</div>
@@ -134,7 +135,12 @@ $(function() {
 				
 		}
 
-
+		
+		function play(name) {
+			var a = new Audio(name);
+			a.volume = $('#vol').slider('getValue') / 100.0;
+			a.play();
+		}
 
 		function saveConfig() {
 			fs.writeFileSync(myDir + '/config', JSON.stringify(config), 'utf8');
@@ -148,6 +154,7 @@ $(function() {
 				config = JSON.parse(fs.readFileSync(myDir + "/config", "utf8"));
 			}
 			var d = $('#dial');
+			if (typeof(config.volume)!='undefined') $('#vol').slider('setValue', config.volume);
 			if (typeof(config.region)!='undefined') $('#tbRegion').textbox('setValue', config.region);
 			if (typeof(config.channel)!='undefined') $('#tbChannel').textbox('setValue', config.channel);
 
@@ -158,6 +165,12 @@ $(function() {
 					if (config.theme == 'black') bNight.linkbutton('select');
 				}										
 			})();
+
+			$('#vol').slider({ onComplete: function(value) {
+				play('click.wav');
+				config.volume = value;
+				saveConfig();
+			}});
 
 
 
@@ -349,7 +362,7 @@ $(function() {
 								map[name] = data; 
 								je2.click(function() {
 									data.watch = ! data.watch;
-									new Audio('click.wav').play();
+									play('click.wav');
 									paint(data);
 								});
 								je3.text(data.oname);
@@ -420,8 +433,7 @@ $(function() {
 							map[i].tm = new Date().getTime();
 							map[i].alert = true;
 							(function() {
-								var a = new Audio(map[i].watch ? 'alarm.wav' : 'click.wav');
-								a.play();
+								play(map[i].watch ? 'alarm.wav' : 'click.wav');
 							})();
 							paint(map[i]);
 						}
